@@ -2,11 +2,20 @@ import MemberLayout from '@/components/layout/MemberLayout';
 import LessonCard from '@/components/sections/LessonCard';
 import { courses, lessons } from '@/lib/data';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 export default function LessonPage({ params }: { params: { slug: string; lesson: string } }) {
-  const course = courses.find(c => c.slug === params.slug) || courses[0];
+  const course = courses.find(c => c.slug === params.slug);
+  if (!course) {
+    notFound();
+  }
+
   const courseLessons = lessons.filter(l => l.courseId === course.id);
-  const currentLesson = courseLessons[0];
+  const currentLesson = courseLessons.find(l => l.slug === params.lesson);
+  if (!currentLesson) {
+    notFound();
+  }
+
   const completedIds = ['1', '2'];
 
   return (
