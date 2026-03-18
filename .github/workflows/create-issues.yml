@@ -2,6 +2,11 @@ name: Create Implementation Issues
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'copilot/create-12-github-issues'
+    paths:
+      - '.github/workflows/create-issues.yml'
 
 permissions:
   issues: write
@@ -13,7 +18,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create labels (skip if issues already exist)
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --state all --limit 100 --json title --jq '.[].title' 2>/dev/null | grep -c "\[Foundation\]\|\[Payments\]\|\[Video\]" || echo "0")
+          echo "existing_count=$EXISTING"
+          if [ "$EXISTING" -ge "12" ]; then
+            echo "All 12 issues already exist. Skipping creation."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create labels
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -29,6 +49,7 @@ jobs:
           gh label create "security" --color "EE0701" --description "Security related" --force
 
       - name: Create Issue 1 - Database Setup
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -77,6 +98,7 @@ jobs:
             --label "priority:critical,phase:1-foundation,backend"
 
       - name: Create Issue 2 - Authentication System
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -138,6 +160,7 @@ jobs:
             --label "priority:critical,phase:1-foundation,backend,security"
 
       - name: Create Issue 3 - Auth Middleware and Route Protection
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -187,6 +210,7 @@ jobs:
             --label "priority:critical,phase:1-foundation,backend,security"
 
       - name: Create Issue 4 - User Management API
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -248,6 +272,7 @@ jobs:
             --label "priority:critical,phase:1-foundation,backend"
 
       - name: Create Issue 5 - Course Management API
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -316,6 +341,7 @@ jobs:
             --label "priority:critical,phase:1-foundation,backend"
 
       - name: Create Issue 6 - Enrollment and Progress API
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -395,6 +421,7 @@ jobs:
             --label "priority:critical,phase:1-foundation,backend"
 
       - name: Create Issue 7 - Stripe Integration Setup
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -450,6 +477,7 @@ jobs:
             --label "priority:high,phase:2-payments,backend"
 
       - name: Create Issue 8 - Subscription Checkout and Management
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -517,6 +545,7 @@ jobs:
             --label "priority:high,phase:2-payments,backend"
 
       - name: Create Issue 9 - Subscription Access Middleware
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -565,6 +594,7 @@ jobs:
             --label "priority:high,phase:2-payments,backend"
 
       - name: Create Issue 10 - Mux Video Streaming Integration
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -632,6 +662,7 @@ jobs:
             --label "priority:high,phase:3-video,backend"
 
       - name: Create Issue 11 - Video Player with Progress Tracking
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -692,6 +723,7 @@ jobs:
             --label "priority:high,phase:3-video,frontend"
 
       - name: Create Issue 12 - Admin Video Upload Interface
+        if: steps.check.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
