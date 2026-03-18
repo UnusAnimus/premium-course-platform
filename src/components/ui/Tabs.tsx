@@ -29,7 +29,7 @@ export default function Tabs({ tabs, defaultIndex = 0, value, onChange }: TabsPr
           <button key={i} onClick={() => handleClick(i)}
             role="tab"
             aria-selected={active === i}
-            aria-label={tab.label}
+
             className={`px-4 py-2.5 text-sm font-medium transition-all border-b-2 -mb-px ${
               active === i
                 ? 'border-blue-500 text-blue-400'
