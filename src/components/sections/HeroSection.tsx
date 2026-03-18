@@ -69,11 +69,11 @@ export default function HeroSection() {
           </span>
         </h1>
 
-        <p className="text-lg sm:text-xl text-[#6b7280] max-w-2xl mx-auto mb-10 animate-fadeIn" style={{ animationDelay: '0.3s', opacity: 0 }}>
+        <p className="text-lg sm:text-xl text-[#6b7280] max-w-2xl mx-auto mb-10 animate-fadeIn" style={{ animationDelay: '0.3s' }}>
           World-class courses taught by industry experts. Build real-world skills and accelerate your career with AcademyPro.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fadeIn" style={{ animationDelay: '0.5s', opacity: 0 }}>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fadeIn" style={{ animationDelay: '0.5s' }}>
           <Link href="/member/login" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium px-8 py-4 rounded-xl transition-all shadow-lg shadow-blue-500/20 text-base">
             Start Learning Free
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
@@ -83,7 +83,7 @@ export default function HeroSection() {
           </Link>
         </div>
 
-        <div className="mt-20 grid grid-cols-3 gap-8 max-w-lg mx-auto animate-fadeIn" style={{ animationDelay: '0.7s', opacity: 0 }}>
+        <div className="mt-20 grid grid-cols-3 gap-8 max-w-lg mx-auto animate-fadeIn" style={{ animationDelay: '0.7s' }}>
           {[
             { value: `${(stats.totalStudents / 1000).toFixed(0)}K+`, label: 'Students' },
             { value: `${stats.totalCourses}+`, label: 'Courses' },

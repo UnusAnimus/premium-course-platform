@@ -5,6 +5,8 @@ const weeklyActivity = [
   { day: 'Thu', minutes: 120 }, { day: 'Fri', minutes: 75 }, { day: 'Sat', minutes: 0 }, { day: 'Sun', minutes: 60 },
 ];
 const maxMinutes = Math.max(...weeklyActivity.map(d => d.minutes));
+const CHART_HEIGHT = 128;
+const BAR_MAX_HEIGHT = 96;
 
 const courseProgress = [
   { title: 'React 19 Mastery', progress: 78, lessons: 33, total: 42 },
@@ -47,12 +49,12 @@ export default function ProgressPage() {
         {/* Weekly Activity Chart */}
         <div className="bg-[#0f0f1a] border border-[#1f1f2e] rounded-2xl p-6">
           <h2 className="text-lg font-semibold text-[#f0f0f0] mb-6">Weekly Activity</h2>
-        <div className="flex items-end gap-3" style={{ height: '128px' }}>
+        <div className="flex items-end gap-3" style={{ height: `${CHART_HEIGHT}px` }}>
             {weeklyActivity.map(d => {
-              const barHeight = maxMinutes > 0 ? Math.round((d.minutes / maxMinutes) * 96) : 0;
+              const barHeight = maxMinutes > 0 ? Math.round((d.minutes / maxMinutes) * BAR_MAX_HEIGHT) : 0;
               return (
                 <div key={d.day} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full flex items-end justify-center" style={{ height: '96px' }}>
+                  <div className="w-full flex items-end justify-center" style={{ height: `${BAR_MAX_HEIGHT}px` }}>
                     <div className="w-full rounded-t-lg bg-gradient-to-t from-blue-600 to-blue-400 transition-all"
                       style={{ height: `${barHeight}px`, minHeight: d.minutes > 0 ? '8px' : '2px', opacity: d.minutes === 0 ? 0.2 : 1 }} />
                   </div>
