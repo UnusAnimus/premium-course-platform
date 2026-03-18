@@ -23,9 +23,30 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          EXISTING=$(gh issue list --state all --limit 100 --json title --jq '.[].title' 2>/dev/null | grep -c "\[Foundation\]\|\[Payments\]\|\[Video\]" || echo "0")
-          echo "existing_count=$EXISTING"
-          if [ "$EXISTING" -ge "12" ]; then
+          # Check for exact title matches of the 12 expected issues
+          TITLES=(
+            "[Foundation] Set up PostgreSQL database and Prisma ORM"
+            "[Foundation] Implement complete authentication system"
+            "[Foundation] Add authentication middleware and protect routes"
+            "[Foundation] Build User Management API endpoints"
+            "[Foundation] Build Course Management API endpoints"
+            "[Foundation] Build Enrollment and Progress Tracking API"
+            "[Payments] Integrate Stripe for payment processing"
+            "[Payments] Build subscription checkout and management"
+            "[Payments] Add middleware to enforce subscription access"
+            "[Video] Integrate Mux for video streaming"
+            "[Video] Build video player with progress tracking"
+            "[Video] Build admin video upload interface"
+          )
+          MATCH_COUNT=0
+          ALL_TITLES=$(gh issue list --state all --limit 500 --json title --jq '.[].title' 2>/dev/null || echo "")
+          for TITLE in "${TITLES[@]}"; do
+            if echo "$ALL_TITLES" | grep -qF "$TITLE"; then
+              MATCH_COUNT=$((MATCH_COUNT + 1))
+            fi
+          done
+          echo "Found $MATCH_COUNT of 12 expected issues"
+          if [ "$MATCH_COUNT" -ge "12" ]; then
             echo "All 12 issues already exist. Skipping creation."
             echo "skip=true" >> $GITHUB_OUTPUT
           else
@@ -37,8 +58,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Labels for the first 12 issues (Phase 1-3)
           gh label create "priority:critical" --color "B60205" --description "Must have for MVP" --force
           gh label create "priority:high" --color "D93F0B" --description "Important for production" --force
+          # priority:medium and phase:4-email are pre-created for future issues (Phase 4+, see IMPLEMENTATION_ISSUES.md)
           gh label create "priority:medium" --color "E4E669" --description "Nice to have" --force
           gh label create "phase:1-foundation" --color "0075CA" --description "Phase 1: Foundation" --force
           gh label create "phase:2-payments" --color "0075CA" --description "Phase 2: Payments" --force
