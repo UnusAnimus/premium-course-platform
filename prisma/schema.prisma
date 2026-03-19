@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  user
+  admin
+}
+
+enum Plan {
+  basic
+  pro
+  enterprise
+}
+
+enum Level {
+  Beginner
+  Intermediate
+  Advanced
+}
+
+enum SubscriptionStatus {
+  active
+  canceled
+  past_due
+  trialing
+  incomplete
+}
+
+enum PaymentStatus {
+  succeeded
+  pending
+  failed
+  refunded
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(user)
+  plan      Plan     @default(basic)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  enrollments    Enrollment[]
+  lessonProgress LessonProgress[]
+  subscriptions  Subscription[]
+  payments       Payment[]
+  sessions       Session[]
+
+  @@map("users")
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  instructor  String
+  category    String   @default("")
+  level       Level    @default(Beginner)
+  price       Int
+  thumbnail   String   @default("")
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  lessons     Lesson[]
+  enrollments Enrollment[]
+
+  @@map("courses")
+}
+
+model Lesson {
+  id            String   @id @default(cuid())
+  courseId      String
+  title         String
+  slug          String
+  description   String   @default("")
+  videoUrl      String   @default("")
+  muxAssetId    String?
+  muxPlaybackId String?
+  duration      String   @default("")
+  order         Int
+  isFree        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  course         Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessonProgress LessonProgress[]
+
+  @@unique([courseId, order])
+  @@unique([courseId, slug])
+  @@map("lessons")
+}
+
+model Enrollment {
+  id          String    @id @default(cuid())
+  userId      String
+  courseId    String
+  progress    Int       @default(0)
+  enrolledAt  DateTime  @default(now())
+  completedAt DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model LessonProgress {
+  id           String    @id @default(cuid())
+  userId       String
+  lessonId     String
+  completed    Boolean   @default(false)
+  watchTime    Int       @default(0)
+  lastPosition Int       @default(0)
+  completedAt  DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("lesson_progress")
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String
+  plan                 Plan
+  status               SubscriptionStatus @default(active)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  amount          Int
+  currency        String        @default("usd")
+  status          PaymentStatus @default(pending)
+  stripePaymentId String?
+  createdAt       DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
